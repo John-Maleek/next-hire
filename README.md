@@ -39,6 +39,27 @@ Recruiters can post jobs and manage applications, while applicants can browse jo
 ---
 
 ## 📂 Project Structure
+```src/
+  app/
+    (auth)/
+      login/
+      register/
+    (recruiter)/
+      dashboard/
+      jobs/
+    (applicant)/
+      jobs/
+      applications/
+    api/
+      auth/
+      jobs/
+      applications/
+  components/
+  lib/
+  prisma/
+    schema.prisma
+  styles/
+
 
 
 ---
@@ -47,47 +68,35 @@ Recruiters can post jobs and manage applications, while applicants can browse jo
 
 ```prisma
 model User {
-  id          String   @id @default(uuid())
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  email       String   @unique
+  email       String         @unique
   password    String
   role        Role
-  jobs        Job[]    @relation("RecruiterJobs")
+  jobs        Job[]          @relation("RecruiterJobs")
   applications Application[]
 }
 
 model Job {
-  id          String   @id @default(uuid())
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String
   location    String
   salaryRange String?
-  recruiter   User     @relation("RecruiterJobs", fields: [recruiterId], references: [id])
-  recruiterId String
+  recruiter   User           @relation("RecruiterJobs", fields: [recruiterId], references: [id])
+  recruiterId String         @db.ObjectId
   applications Application[]
+  createdAt   DateTime       @default(now())
 }
 
 model Application {
-  id          String @id @default(uuid())
-  applicant   User   @relation(fields: [applicantId], references: [id])
-  applicantId String
-  job         Job    @relation(fields: [jobId], references: [id])
-  jobId       String
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  applicant   User              @relation(fields: [applicantId], references: [id])
+  applicantId String            @db.ObjectId
+  job         Job               @relation(fields: [jobId], references: [id])
+  jobId       String            @db.ObjectId
   resumeUrl   String?
   coverLetter String?
   status      ApplicationStatus @default(PENDING)
+  createdAt   DateTime          @default(now())
 }
-
-enum Role {
-  RECRUITER
-  APPLICANT
-}
-
-enum ApplicationStatus {
-  PENDING
-  SHORTLISTED
-  REJECTED
-  HIRED
-}
-
-
